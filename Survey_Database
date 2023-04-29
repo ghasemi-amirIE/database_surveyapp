@@ -1,0 +1,145 @@
+Create database sql_SurveyDatabase;
+USE sql_SurveyDatabase;
+
+CREATE TABLE Survey
+(	survey_id INT PRIMARY KEY auto_increment,
+    survey_name VARCHAR(100) NOT NULL UNIQUE);
+
+CREATE TABLE Survey_Module
+(	survey_module_id INT PRIMARY KEY auto_increment,
+    survey_module_name VARCHAR(100) NOT NULL UNIQUE,
+    survey_id INT NOT NULL,
+    FOREIGN KEY fk_Survey_Module_Survey (survey_id)
+			REFERENCES Survey (survey_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION);
+
+CREATE TABLE Questions
+(	question_id INT PRIMARY KEY auto_increment);
+
+CREATE TABLE Survey_Module_Question
+(	survey_module_id INT PRIMARY KEY auto_increment unique,
+	question_id INT NOT NULL,
+    FOREIGN KEY fk_Survey_Module_Question_Questions (question_id)
+			REFERENCES Questions (question_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION,
+    question_number INT UNIQUE);
+
+CREATE TABLE Footnote
+(	survey_module_id INT NOT NULL,
+	FOREIGN KEY fk_Survey_Module_Footnote (survey_module_id)
+			REFERENCES Survey_Module (survey_module_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION,
+	question_id INT NOT NULL,
+    FOREIGN KEY fk_Questions_Footnote (question_id)
+			REFERENCES Questions (question_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION,
+	part_sequence_number INT PRIMARY KEY auto_increment unique,
+	footnote_text LONGTEXT);
+
+CREATE TABLE Question_Part_Text
+(	question_part_text_id INT PRIMARY KEY auto_increment unique,
+    question_part_text VARCHAR(5000));
+
+CREATE TABLE Question_Instruction
+(	question_instruction_id INT PRIMARY KEY auto_increment unique,
+    question_instruction VARCHAR(5000) DEFAULT " ");
+
+CREATE TABLE Answer_Part
+(	answer_part_id INT PRIMARY KEY auto_increment unique,
+	answer_part_type VARCHAR(200));
+
+CREATE TABLE Additional_Answer
+(	additional_answer_id INT PRIMARY KEY auto_increment unique,
+	additional_answer_type VARCHAR(200));
+
+CREATE TABLE Question_Part
+(	question_id INT NOT NULL,
+	FOREIGN KEY fk_Question_Part_Questions (question_id)
+			REFERENCES Questions (question_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION,
+	part_sequence_number INT,
+    FOREIGN KEY fk_Question_Part_Footnote (part_sequence_number)
+			REFERENCES Footnote (part_sequence_number)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION,
+	level int,
+	variable_name VARCHAR(500),
+    addtional_variable_name VARCHAR(500),
+    question_part_text_id INT NOT NULL,
+    FOREIGN KEY fk_Question_Part_Question_Part_Text (question_part_text_id)
+			REFERENCES Question_Part_Text(question_part_text_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION,
+    question_instruction_id INT,
+    FOREIGN KEY fk_Question_Part_Question_Instruction (question_instruction_id)
+			REFERENCES Question_Instruction (question_instruction_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION,
+    answer_part_id INT NOT NULL,
+    FOREIGN KEY fk_Question_Part_Answer_Part (answer_part_id)
+			REFERENCES Answer_Part (answer_part_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION,
+	additional_answer_id INT,
+    FOREIGN KEY fk_Question_Part_Additional_Answer (additional_answer_id)
+			REFERENCES Additional_Answer (additional_answer_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION);
+
+CREATE TABLE Choice_Group
+(	choice_group_id INT PRIMARY KEY auto_increment unique,
+	choice_group VARCHAR(500));
+
+CREATE TABLE Choice_Text
+(	choice_text_id INT PRIMARY KEY auto_increment unique,
+	choice_text VARCHAR(200));
+ 
+CREATE TABLE Answer_Choice
+(	answer_part_id INT NOT NULL,
+    FOREIGN KEY fk_Answer_Choice_Answer_Part (answer_part_id)
+			REFERENCES Answer_Part (answer_part_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION,
+	choice_sequence_number INT PRIMARY KEY auto_increment unique,
+	choice_text_id INT NOT NULL,
+	FOREIGN KEY fk_Answer_Choice_Choice_Text (choice_text_id)
+			REFERENCES Choice_Text (choice_text_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION,
+	choice_value VARCHAR(50),
+    choice_group_id INT NOT NULL,
+    FOREIGN KEY fk_Answer_Choice_Choice_Group (choice_group_id)
+			REFERENCES Choice_Group (choice_group_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION,
+	additional_variable_name VARCHAR(50),
+    additional_answer_id INT,
+    FOREIGN KEY fk_Answer_Choice_Additional_Answer (additional_answer_id)
+			REFERENCES Additional_Answer (additional_answer_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION
+    );
+
+CREATE TABLE Additional_Answer_Choice
+(	additional_answer_id INT NOT NULL,
+    FOREIGN KEY fk_Additional_Answer_Choice_Additional_Answer (additional_answer_id)
+			REFERENCES Additional_Answer (additional_answer_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION,
+	choice_sequence_number INT PRIMARY KEY auto_increment unique,
+    choice_value VARCHAR(50),
+    choice_text_id INT NOT NULL,
+    FOREIGN KEY fk_Additional_Answer_Choice_Choice_Text (choice_text_id)
+			REFERENCES Choice_Text (choice_text_id)
+            ON UPDATE CASCADE
+			ON DELETE NO ACTION);
+
+    
+
+
+
